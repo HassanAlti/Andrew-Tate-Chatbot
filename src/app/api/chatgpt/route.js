@@ -73,7 +73,7 @@ app.post("/api/chat", async (req, res) => {
 
   let memoryContext = await memoryManager.readLatestHistory(companionKey);
 
-  let thousandCon = memoryContext.slice(-1000);
+  let thousandCon = memoryContext.slice(-1500);
 
   await memoryManager.writeToHistory("Human: " + prompt + "\n", companionKey);
   let recentChatHistory = await memoryManager.readLatestHistory(companionKey);
@@ -108,7 +108,7 @@ app.post("/api/chat", async (req, res) => {
 
   Below is a recent conversation history with a Human.
 
-  ${recentChatHistory}
+  ${thousandCon}
 
   Below is relevant data/context:
   ${relevantHistory}
