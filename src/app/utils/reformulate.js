@@ -19,11 +19,16 @@ export default async function addMessageToCache(his, userPrompt) {
 
       If the New question can stand on its own you should return the New question. 
 
+      If the question contains a swear word, keep it as it is, DO NOT CHANGE IT!
+
+      If the question is a statement and not a question, DO NOT CHANGE IT!
+
       Return the question as if you are "Human" asking to "Andrew Tate", in the format: Human: New Question
       
       New question: ${userPrompt}, 
       
       Chat history: ${his}
+
         `,
     },
   ];
@@ -32,6 +37,7 @@ export default async function addMessageToCache(his, userPrompt) {
   const completion = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
     messages: [...chatHistory],
+    temperature: 0.1,
   });
 
   // Add the system's message to the chat history

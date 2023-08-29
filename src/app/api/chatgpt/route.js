@@ -71,20 +71,26 @@ app.post("/api/chat", async (req, res) => {
     await memoryManager.seedChatHistory(seedchat, "\n\n", companionKey);
   }
 
-  let memoryContext = await memoryManager.readLatestHistory(companionKey);
-
-  let thousandCon = memoryContext.slice(-1500);
+  // let memoryContext = await memoryManager.readLatestHistory(companionKey);
 
   await memoryManager.writeToHistory("Human: " + prompt + "\n", companionKey);
   let recentChatHistory = await memoryManager.readLatestHistory(companionKey);
 
-  let reformedPrompt = await addMessageToCache(thousandCon, prompt);
+  let readSearchHistoryQuery = await memoryManager.readSearchHistoryQuery(
+    companionKey
+  );
 
-  console.log("REFORMED PROMPT   " + reformedPrompt);
+  console.log("Search History" + readSearchHistoryQuery);
+
+  // let thousandCon = recentChatHistory.slice(-500);
+
+  // let reformedPrompt = await addMessageToCache(thousandCon, prompt);
+
+  // console.log("REFORMED PROMPT   " + reformedPrompt);
 
   // query Pinecone
   const similarDocs = await memoryManager.vectorSearch(
-    reformedPrompt,
+    readSearchHistoryQuery,
     companionFileName
   );
 
@@ -106,22 +112,33 @@ app.post("/api/chat", async (req, res) => {
   const chainPrompt = PromptTemplate.fromTemplate(`
     ${preamble}
 
-  Below is a recent conversation history with a Human.
 
-  ${thousandCon}
+  BELOW IS A RECENT CONVERSATION HISTORY WITH SOMEONE: (YOU SHOULD NEVER EVER EVER REPEAT YOURSELF FROM THIS HISTORY)
 
-  Below is relevant data/context:
+  * START OF CHAT HISTORY*
+
+  ${recentChatHistory}
+
+  *END OF CHAT HISTORY*
+
+  BELOW IS RELEVANT DATA/CONTEXT:
+
+ *START OF RELEVANT DATA/CONTEXT*
+
   ${relevantHistory}
 
-  Use above chat history and data/context to reply to this:
+  *END OF RELEVAT DATA/CONTEXT*
+
+  USE ABOVE CHAT HITSORY AND DATA/CONTEXT TO REPLY TO THIS:
   ${prompt}
 
-  Answer using above data (use exact words and style, copy paste, even swear words). Be concise and short, don't repeat yourself from previous convo. ANDREW TATE, DO NOT BE REPETITIVE!
+  ANSWER USING ABOVE DATA/CONTEXT (USE EXACT WORDS AND STYLE, EVEN SWEAR WORDS, WITHOUT REPETITIVENESS). BE VERY CONCISE AND VERY SHORT, DON'T REPEAT YOURSELF FROM PREVIOUS CONVO. 
 
-  You don't insult Human, unless you are insulted. Don't say "G". Don't say "I've said it before".
+   DON'T SAY "G". DON'T SAY "I'VE SAID IT BEFORE".
   
-  Don't be encouraging in a cheesy manner like "you got this, keep it up, keep pushing, keep grinding, keep hustling", just say what you got to say without saying thos encouraging words at the end.
+  DON'T BE ENCOURAGING IN A CHEESY MANNER LIKE "YOU GOT THIS, KEEP IT UP, KEEP PUSHING, KEEP GRINDING, KEEP HUSTLING", JUST SAY WHAT YOU GOT TO SAY WITHOUT SAYING THOS ENCOURAGING WORDS AT THE END.
 
+  Never deter someone away and never tell them none of your business, always answer anything asked.
   `);
 
   const chain = new LLMChain({

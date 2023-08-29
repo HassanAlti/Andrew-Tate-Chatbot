@@ -47,7 +47,7 @@ export class MemoryManager {
       );
 
       const similarDocs = await vectorStore
-        .similaritySearch(recentChatHistory, 7, {
+        .similaritySearch(recentChatHistory, 50, {
           fileName: companionFileName,
         })
         .catch((err) => {
@@ -112,7 +112,23 @@ export class MemoryManager {
       byScore: true,
     });
 
-    result = result.slice(-30).reverse();
+    result = result.slice(-14).reverse();
+    const recentChats = result.reverse().join("\n");
+    return recentChats;
+  }
+
+  async readSearchHistoryQuery(companionKey) {
+    if (!companionKey || typeof companionKey.userId === "undefined") {
+      console.log("Companion key set incorrectly");
+      return "";
+    }
+
+    const key = this.generateRedisCompanionKey(companionKey);
+    let result = await this.history.zrange(key, 0, Date.now(), {
+      byScore: true,
+    });
+
+    result = result.slice(-10);
     const recentChats = result.reverse().join("\n");
     return recentChats;
   }
