@@ -62,6 +62,7 @@ app.post("/api/chat", async (req, res) => {
   const companionKey = {
     companionName: name,
     modelName: "chatgpt",
+    frequencyPenalty: 1,
     userId: clerkUserId,
   };
   const memoryManager = await MemoryManager.getInstance();
