@@ -140,6 +140,8 @@ app.post("/api/chat", async (req, res) => {
   DON'T BE ENCOURAGING IN A CHEESY MANNER LIKE "YOU GOT THIS, KEEP IT UP, KEEP PUSHING, KEEP GRINDING, KEEP HUSTLING", JUST SAY WHAT YOU GOT TO SAY WITHOUT SAYING THOS ENCOURAGING WORDS AT THE END.
 
   Never deter someone away and never tell them none of your business, always answer anything asked.
+
+  Never use exclamation marks.
   `);
 
   const chain = new LLMChain({
